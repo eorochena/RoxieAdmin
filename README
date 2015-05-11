@@ -1,0 +1,4 @@
+1.- Run the setup.sh script to install all the necessary files.
+2.- Run 'source /etc/bash_completion.d/Moxie' if you want this session particular
+    Shell to inherit tab autocomplete .
+

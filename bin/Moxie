@@ -1,0 +1,257 @@
+#!/usr/bin/python
+
+# If executed from a node that belongs to a Roxie Cluster, this script will restart the roxie process in the entire cluster. Similar to the startup command in 702 Roxie builds
+
+import xml.etree.ElementTree as ET
+import subprocess, paramiko, sys, os, readline
+from threading import Thread
+from random import choice
+
+directory = '/var/lib/HPCCSystems/'
+user = 'root'
+xml_location = '/etc/HPCCSystems'
+xml = 'environment.xml'
+cow1 = open('/usr/games/Moo1')
+cow2 = open('/usr/games/Moo2')
+cow3 = open('/usr/games/Moo3')
+cow4 = open('/usr/games/Moo4')
+cow5 = open('/usr/games/Moo5')
+
+if xml not in os.listdir(xml_location):
+	print
+	print "Server doesn't appear to have an xml file"
+	print
+	sys.exit()
+else:
+	def GetRoxieName():
+		content = ET.parse('/etc/HPCCSystems/environment.xml')
+		root = content.getroot()
+		name = []
+		for i in root.findall('Software/RoxieCluster'):
+			component = i.get('name')
+			if component == None:
+				continue
+			name.append(component)
+		return name
+
+	if len(GetRoxieName()) == 0:
+		print
+		print "No Roxie Clusters were defined in this environment, check /etc/HPCCSystems/environment.xml file"
+		print
+		sys.exit()
+
+	def GetRoxie():
+		folder = []
+		for i in GetRoxieName():
+			if i in os.listdir(directory):
+				folder.append(i)
+		return folder
+	if len(GetRoxie()) == 0:
+		print 
+		print "This server doesn't look like it has a Roxie component configured, check /etc/HPCCSystems/environment.xml"
+		print
+		sys.exit()
+
+	def GetRoxieXML():
+		for i in GetRoxie():
+			if i in os.listdir(directory):
+				for item in os.listdir(directory):
+					if item == i:
+						RoxieXML = directory + i
+						RoxieFile = RoxieXML + '/RoxieTopology.xml'
+			return RoxieFile
+
+	def unique():
+		for i in GetRoxieName():
+			for item in os.listdir(directory):
+				if item == i:
+					return i
+	def GetIPs():
+		content = ET.parse(GetRoxieXML())
+		root = content.getroot()
+		name = []
+		for i in root.findall('RoxieSlaveProcess'):
+			component = i.get('netAddress')
+			name.append(component)
+		ip = list(set(name))
+		if len(ip) == 0:
+			for i in root.findall('RoxieServerProcess'):
+				new_component = i.get('netAddress')
+				name.append(new_component)
+		ip = list(set(name))
+		return ip
+
+	class moxie():
+
+		def __init__(self, roxie):
+			self.roxie = roxie
+
+		def status(self):
+			def do_it(i):
+				cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;service hpcc-init -c %s status" % unique()]
+				ssh = paramiko.SSHClient()
+				ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+				ssh.connect(i, username=user)
+				stdin, stdout, stderr = ssh.exec_command(cmd[0])
+				print stdout.read(),
+				ssh.close()
+			def run_it():
+				for i in GetIPs():
+					start = Thread(target = do_it, args = (i,))
+					start.start()
+			return run_it()
+
+		def start(self):
+			def do_it(i):
+				cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;service hpcc-init -c %s start" % unique()]
+				ssh = paramiko.SSHClient()
+				ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+				ssh.connect(i, username=user)
+				stdin, stdout, stderr = ssh.exec_command(cmd[0])
+				print stdout.read(),
+				ssh.close()
+			def run_it():
+				for i in GetIPs():
+					start = Thread(target = do_it, args = (i,))
+					start.start()
+			return run_it()
+
+		def restart(self):
+			def do_it(i):
+				cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;service hpcc-init -c %s restart" % unique()]
+				ssh = paramiko.SSHClient()
+				ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+				ssh.connect(i, username=user)
+				stdin, stdout, stderr = ssh.exec_command(cmd[0])
+				print stdout.read(),
+				ssh.close()
+			def run_it():
+				for i in GetIPs():
+					start = Thread(target = do_it, args = (i,))
+					start.start()
+			return run_it()
+
+		def stop(self):
+			def do_it(i):
+				cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;service hpcc-init -c %s stop" % unique()]
+				ssh = paramiko.SSHClient()
+				ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+				ssh.connect(i, username=user)
+				stdin, stdout, stderr = ssh.exec_command(cmd[0])
+				print stdout.read(),
+				ssh.close()
+			def run_it():
+				for i in GetIPs():
+					start = Thread(target = do_it, args = (i,))
+					start.start()
+			return run_it()
+
+		def kill_all(self):
+			def do_it(i):
+				cmd = "ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;pgrep roxie|xargs kill -9"
+				ssh = paramiko.SSHClient()
+				ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+				ssh.connect(i, username=user)
+				stdin, stdout, stderr = ssh.exec_command(cmd)
+				print stdout.read(),
+				ssh.close()
+			def run_it():
+				for i in GetIPs():
+					start = Thread(target = do_it, args = (i,))
+					start.start()
+			return run_it()
+
+		def stop_one(self):
+			cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;service hpcc-init -c %s stop" % unique()]
+			command = cmd[0]
+			execution = subprocess.call(command, shell = True)
+
+		def start_one(self):
+			cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;service hpcc-init -c %s start" % unique()]
+			command = cmd[0]
+			execution = subprocess.call(command, shell = True)
+
+		def restart_one(self):
+			cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;service hpcc-init -c %s restart" % unique()]
+			command = cmd[0]
+			execution = subprocess.call(command, shell =  True)
+	
+		def kill_one(self):
+			cmd = "ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;pgrep roxie|xargs kill -9"
+			execution = subprocess.call(cmd, shell = True)
+
+		def moxie_help(self):
+			cmd = 'man moxie'
+			execution = subprocess.call(cmd, shell = True)
+		
+	class Hidden():
+		def __init__(self, name):
+			self.name = name		
+
+		def startup(self):
+			random_number = range(1, 6)
+			your_number = choice(random_number)
+	
+			if your_number == 1:
+				print cow1.read()
+
+			elif your_number == 2:
+				print cow2.read()
+
+			elif your_number == 3:
+				print cow3.read()
+			
+			elif your_number == 4:
+				print cow4.read()
+
+			elif your_number == 5:
+				print cow5.read()
+			return your_number
+
+
+	if len(sys.argv) < 2 or len(sys.argv) > 2:
+		print
+		print "You need to specify one option, type 'man moxie', 'Moxie help' or press the TAB key for the complete list of available options"
+		print
+		print sys.argv[0], 'start','\n','               stop','\n','               restart','\n','               status','\n'
+		sys.exit()
+
+moxie = moxie(sys.argv[0])
+Hidden = Hidden(sys.argv[0])
+
+if sys.argv[1] == 'help':
+	moxie.moxie_help()
+
+elif sys.argv[1] == 'status':
+	moxie.status()
+
+elif sys.argv[1] == 'start':
+	moxie.start()
+
+elif sys.argv[1] == 'restart':
+	moxie.restart()
+
+elif sys.argv[1] == 'stop':
+	moxie.stop()
+
+elif sys.argv[1] == 'stop-one':
+	moxie.stop_one()
+
+elif sys.argv[1] == 'start-one':
+	moxie.start_one()
+
+elif sys.argv[1] == 'restart-one':
+	moxie.restart_one()
+
+elif sys.argv[1] == 'kill-all':
+	moxie.kill_all()
+
+elif sys.argv[1] == 'kill-one':
+	moxie.kill_one()
+
+elif sys.argv[1] == 'startup':
+	Hidden.startup()
+
+else:
+	print "That's not a valid option, type 'Moxie', 'Moxie help', 'man moxie' or press the TAB key for bash completion"
+	sys.exit()
