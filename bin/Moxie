@@ -8,7 +8,7 @@ from threading import Thread
 from random import choice
 
 directory = '/var/lib/HPCCSystems/'
-user = 'root'
+user = 'hpcc'
 xml_location = '/etc/HPCCSystems'
 xml = 'environment.xml'
 cow1 = open('/usr/games/Moo1')
@@ -88,7 +88,7 @@ else:
 
 		def status(self):
 			def do_it(i):
-				cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;service hpcc-init -c %s status" % unique()]
+				cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;sudo /etc/init.d/hpcc-init -c %s status" % unique()]
 				ssh = paramiko.SSHClient()
 				ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 				ssh.connect(i, username=user)
@@ -103,7 +103,7 @@ else:
 
 		def start(self):
 			def do_it(i):
-				cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;service hpcc-init -c %s start" % unique()]
+				cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;sudo /etc/init.d/hpcc-init -c %s start" % unique()]
 				ssh = paramiko.SSHClient()
 				ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 				ssh.connect(i, username=user)
@@ -118,7 +118,7 @@ else:
 
 		def restart(self):
 			def do_it(i):
-				cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;service hpcc-init -c %s restart" % unique()]
+				cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;sudo /etc/init.d/hpcc-init -c %s restart" % unique()]
 				ssh = paramiko.SSHClient()
 				ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 				ssh.connect(i, username=user)
@@ -133,7 +133,7 @@ else:
 
 		def stop(self):
 			def do_it(i):
-				cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;service hpcc-init -c %s stop" % unique()]
+				cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;sudo /etc/init.d/hpcc-init -c %s stop" % unique()]
 				ssh = paramiko.SSHClient()
 				ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 				ssh.connect(i, username=user)
@@ -148,7 +148,7 @@ else:
 
 		def kill_all(self):
 			def do_it(i):
-				cmd = "ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;pgrep roxie|xargs kill -9"
+				cmd = "ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;pgrep roxie|xargs sudo kill -9"
 				ssh = paramiko.SSHClient()
 				ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 				ssh.connect(i, username=user)
@@ -162,22 +162,22 @@ else:
 			return run_it()
 
 		def stop_one(self):
-			cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;service hpcc-init -c %s stop" % unique()]
+			cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;sudo /etc/init.d/hpcc-init -c %s stop" % unique()]
 			command = cmd[0]
 			execution = subprocess.call(command, shell = True)
 
 		def start_one(self):
-			cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;service hpcc-init -c %s start" % unique()]
+			cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;sudo /etc/init.d/hpcc-init -c %s start" % unique()]
 			command = cmd[0]
 			execution = subprocess.call(command, shell = True)
 
 		def restart_one(self):
-			cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;service hpcc-init -c %s restart" % unique()]
+			cmd = ["ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;sudo /etc/init.d/hpcc-init -c %s restart" % unique()]
 			command = cmd[0]
 			execution = subprocess.call(command, shell =  True)
 	
 		def kill_one(self):
-			cmd = "ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;pgrep roxie|xargs kill -9"
+			cmd = "ifconfig|head -2|tail -1|cut -d: -f2|cut -d' ' -f1;pgrep roxie|xargs sudo kill -9"
 			execution = subprocess.call(cmd, shell = True)
 
 		def moxie_help(self):
