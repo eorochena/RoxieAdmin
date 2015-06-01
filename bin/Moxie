@@ -11,11 +11,11 @@ directory = '/var/lib/HPCCSystems/'
 user = 'hpcc'
 xml_location = '/etc/HPCCSystems'
 xml = 'environment.xml'
-cow1 = open('/usr/games/Moo1')
-cow2 = open('/usr/games/Moo2')
-cow3 = open('/usr/games/Moo3')
-cow4 = open('/usr/games/Moo4')
-cow5 = open('/usr/games/Moo5')
+#cow1 = open('/usr/games/Moo1')
+#cow2 = open('/usr/games/Moo2')
+#cow3 = open('/usr/games/Moo3')
+#cow4 = open('/usr/games/Moo4')
+#cow5 = open('/usr/games/Moo5')
 
 if xml not in os.listdir(xml_location):
 	print
