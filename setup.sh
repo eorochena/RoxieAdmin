@@ -1,5 +1,5 @@
-cp Bash-Complete/Moxie /etc/bash_completion.d/
-cp Bash-Complete/auto.sh /etc/profile.d/
-cp Executables/Moxie /usr/bin/
-cp Executables/Moo* /usr/games/
-cp ManPages/moxie.8.gz /usr/share/man/man8/
+sudo cp Bash-Complete/Moxie /etc/bash_completion.d/
+sudo cp Bash-Complete/auto.sh /etc/profile.d/
+sudo cp bin/Moxie /usr/bin/
+sudo cp bin/Moo* /usr/games/
+sudo cp ManPages/moxie.8.gz /usr/share/man/man8/
