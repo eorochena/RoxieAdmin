@@ -8,7 +8,7 @@ from threading import Thread
 from random import choice
 
 directory = '/var/lib/HPCCSystems/'
-user = 'hpcc'
+user = 'any-user'
 xml_location = '/etc/HPCCSystems'
 xml = 'environment.xml'
 #cow1 = open('/usr/games/Moo1')
